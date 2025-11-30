@@ -14,7 +14,11 @@ import java.util.List;
 @RequestMapping("/students" )
 @RestController
 public class StudentController {
-    @Autowired
+
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+
     StudentService service;
 
     @PostMapping
@@ -24,8 +28,36 @@ public class StudentController {
         return ResponseEntity.created(location).body(student);
     }
     @GetMapping
-    public ResponseEntity<List<DadosStudent>> listStudent() {
+    public ResponseEntity<List<DadosStudent>> listAllStudent() {
         var list = service.listarAll();
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
+    @GetMapping("/pendente")
+    public List<Student> searchPendente() {
+        return service.searchPgPendente();
+    }
+    @GetMapping("/cancelados")
+    public List<Student> searchCancelados() {
+        return service.searchPgCancelados();
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Student> findByIdStudent(@PathVariable Long id) {
+        var student = service.buscarPorId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(student);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Student> updateById(@RequestBody Student dados) {
+        var student = service.updateStudent(dados);
+        return ResponseEntity.status(HttpStatus.OK).body(student);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+         service.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+    }
+
 }
